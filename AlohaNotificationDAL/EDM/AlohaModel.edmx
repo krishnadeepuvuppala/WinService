@@ -1,0 +1,382 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="ALOHA_V1_DevModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Definition">
+          <Key>
+            <PropertyRef Name="Definition_Id" />
+          </Key>
+          <Property Name="Definition_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="EventMonitor_CLV_Id" Type="int" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="150" />
+          <Property Name="Description" Type="varchar" MaxLength="150" />
+          <Property Name="Code" Type="varchar" MaxLength="50" />
+          <Property Name="Target_Component_CLV_Id" Type="int" Nullable="false" />
+          <Property Name="Target_SubComponent_CLV_Id" Type="int" Nullable="false" />
+          <Property Name="DisplayTemplate" Type="varchar" MaxLength="150" />
+          <Property Name="IsMonitored" Type="bit" />
+          <Property Name="IsRemoved" Type="bit" Nullable="false" />
+          <Property Name="Subscription_Id" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Message">
+          <Key>
+            <PropertyRef Name="Message_Id" />
+          </Key>
+          <Property Name="Message_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="QueueDisplayMessage" Type="varchar" MaxLength="250" />
+          <Property Name="CreatedTime" Type="bigint" />
+          <Property Name="Target_Id" Type="int" />
+          <Property Name="Createdby_Id" Type="int" />
+          <Property Name="CreatedOn" Type="bigint" />
+          <Property Name="LastEditedBy_Id" Type="int" />
+          <Property Name="LastEditedOn" Type="bigint" />
+          <Property Name="IsRemoved" Type="bit" />
+          <Property Name="Subscription_Id" Type="uniqueidentifier" />
+        </EntityType>
+        <EntityType Name="Parameter">
+          <Key>
+            <PropertyRef Name="Parameter_Id" />
+          </Key>
+          <Property Name="Parameter_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Definition_Id" Type="int" Nullable="false" />
+          <Property Name="ParameterName" Type="varchar" MaxLength="150" />
+          <Property Name="ParameterCode" Type="varchar" MaxLength="50" />
+          <Property Name="ParameterPrefixdescription" Type="varchar" MaxLength="150" />
+          <Property Name="ParameterPostfixdescription" Type="varchar" MaxLength="150" />
+          <Property Name="Parameter_CL_Id" Type="int" Nullable="false" />
+          <Property Name="IsRemoved" Type="bit" Nullable="false" />
+          <Property Name="Subscription_Id" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ParameterValue">
+          <Key>
+            <PropertyRef Name="ParameterValue_Id" />
+          </Key>
+          <Property Name="ParameterValue_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Parameter_Id" Type="int" Nullable="false" />
+          <Property Name="ParameterValue" Type="varchar" MaxLength="150" />
+          <Property Name="IsRemoved" Type="bit" Nullable="false" />
+          <Property Name="Subscription_Id" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="UserQueue">
+          <Key>
+            <PropertyRef Name="UserQueue_Id" />
+          </Key>
+          <Property Name="UserQueue_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Message_Id" Type="int" Nullable="false" />
+          <Property Name="User_Id" Type="int" Nullable="false" />
+          <Property Name="IsRead" Type="bit" />
+          <Property Name="IsHidden" Type="bit" />
+          <Property Name="Createdby_Id" Type="int" />
+          <Property Name="CreatedOn" Type="bigint" />
+          <Property Name="LastEditedBy_Id" Type="int" />
+          <Property Name="LastEditedOn" Type="bigint" />
+          <Property Name="IsRemoved" Type="bit" Nullable="false" />
+          <Property Name="Subscription_Id" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Parameter_Definition">
+          <End Role="Definition" Type="Self.Definition" Multiplicity="1" />
+          <End Role="Parameter" Type="Self.Parameter" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Definition">
+              <PropertyRef Name="Definition_Id" />
+            </Principal>
+            <Dependent Role="Parameter">
+              <PropertyRef Name="Definition_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ParameterValue_Parameter">
+          <End Role="Parameter" Type="Self.Parameter" Multiplicity="1" />
+          <End Role="ParameterValue" Type="Self.ParameterValue" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Parameter">
+              <PropertyRef Name="Parameter_Id" />
+            </Principal>
+            <Dependent Role="ParameterValue">
+              <PropertyRef Name="Parameter_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserQueue_Alert">
+          <End Role="Message" Type="Self.Message" Multiplicity="1" />
+          <End Role="UserQueue" Type="Self.UserQueue" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Message">
+              <PropertyRef Name="Message_Id" />
+            </Principal>
+            <Dependent Role="UserQueue">
+              <PropertyRef Name="Message_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="usp_InsertStaffBirthDayBySubscriptionID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Subscription_Id" Type="uniqueidentifier" Mode="In" />
+        </Function>
+        <EntityContainer Name="ALOHA_V1_DevModelStoreContainer">
+          <EntitySet Name="Definition" EntityType="Self.Definition" Schema="Notification" store:Type="Tables" />
+          <EntitySet Name="Message" EntityType="Self.Message" Schema="Notification" store:Type="Tables" />
+          <EntitySet Name="Parameter" EntityType="Self.Parameter" Schema="Notification" store:Type="Tables" />
+          <EntitySet Name="ParameterValue" EntityType="Self.ParameterValue" Schema="Notification" store:Type="Tables" />
+          <EntitySet Name="UserQueue" EntityType="Self.UserQueue" Schema="Notification" store:Type="Tables" />
+          <AssociationSet Name="FK_Parameter_Definition" Association="Self.FK_Parameter_Definition">
+            <End Role="Definition" EntitySet="Definition" />
+            <End Role="Parameter" EntitySet="Parameter" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ParameterValue_Parameter" Association="Self.FK_ParameterValue_Parameter">
+            <End Role="Parameter" EntitySet="Parameter" />
+            <End Role="ParameterValue" EntitySet="ParameterValue" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserQueue_Alert" Association="Self.FK_UserQueue_Alert">
+            <End Role="Message" EntitySet="Message" />
+            <End Role="UserQueue" EntitySet="UserQueue" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="ALOHA_V1_DevModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Definition">
+          <Key>
+            <PropertyRef Name="Definition_Id" />
+          </Key>
+          <Property Name="Definition_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EventMonitor_CLV_Id" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Description" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Code" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Target_Component_CLV_Id" Type="Int32" Nullable="false" />
+          <Property Name="Target_SubComponent_CLV_Id" Type="Int32" Nullable="false" />
+          <Property Name="DisplayTemplate" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="IsMonitored" Type="Boolean" />
+          <Property Name="IsRemoved" Type="Boolean" Nullable="false" />
+          <Property Name="Subscription_Id" Type="Guid" Nullable="false" />
+          <NavigationProperty Name="Parameters" Relationship="Self.FK_Parameter_Definition" FromRole="Definition" ToRole="Parameter" />
+        </EntityType>
+        <EntityType Name="Message">
+          <Key>
+            <PropertyRef Name="Message_Id" />
+          </Key>
+          <Property Name="Message_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="QueueDisplayMessage" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedTime" Type="Int64" />
+          <Property Name="Target_Id" Type="Int32" />
+          <Property Name="Createdby_Id" Type="Int32" />
+          <Property Name="CreatedOn" Type="Int64" />
+          <Property Name="LastEditedBy_Id" Type="Int32" />
+          <Property Name="LastEditedOn" Type="Int64" />
+          <Property Name="IsRemoved" Type="Boolean" />
+          <Property Name="Subscription_Id" Type="Guid" />
+          <NavigationProperty Name="UserQueues" Relationship="Self.FK_UserQueue_Alert" FromRole="Message" ToRole="UserQueue" />
+        </EntityType>
+        <EntityType Name="Parameter">
+          <Key>
+            <PropertyRef Name="Parameter_Id" />
+          </Key>
+          <Property Name="Parameter_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Definition_Id" Type="Int32" Nullable="false" />
+          <Property Name="ParameterName" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="ParameterCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ParameterPrefixdescription" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="ParameterPostfixdescription" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Parameter_CL_Id" Type="Int32" Nullable="false" />
+          <Property Name="IsRemoved" Type="Boolean" Nullable="false" />
+          <Property Name="Subscription_Id" Type="Guid" Nullable="false" />
+          <NavigationProperty Name="Definition" Relationship="Self.FK_Parameter_Definition" FromRole="Parameter" ToRole="Definition" />
+          <NavigationProperty Name="ParameterValues" Relationship="Self.FK_ParameterValue_Parameter" FromRole="Parameter" ToRole="ParameterValue" />
+        </EntityType>
+        <EntityType Name="ParameterValue">
+          <Key>
+            <PropertyRef Name="ParameterValue_Id" />
+          </Key>
+          <Property Name="ParameterValue_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Parameter_Id" Type="Int32" Nullable="false" />
+          <Property Name="ParameterValue1" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="IsRemoved" Type="Boolean" Nullable="false" />
+          <Property Name="Subscription_Id" Type="Guid" Nullable="false" />
+          <NavigationProperty Name="Parameter" Relationship="Self.FK_ParameterValue_Parameter" FromRole="ParameterValue" ToRole="Parameter" />
+        </EntityType>
+        <EntityType Name="UserQueue">
+          <Key>
+            <PropertyRef Name="UserQueue_Id" />
+          </Key>
+          <Property Name="UserQueue_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Message_Id" Type="Int32" Nullable="false" />
+          <Property Name="User_Id" Type="Int32" Nullable="false" />
+          <Property Name="IsRead" Type="Boolean" />
+          <Property Name="IsHidden" Type="Boolean" />
+          <Property Name="Createdby_Id" Type="Int32" />
+          <Property Name="CreatedOn" Type="Int64" />
+          <Property Name="LastEditedBy_Id" Type="Int32" />
+          <Property Name="LastEditedOn" Type="Int64" />
+          <Property Name="IsRemoved" Type="Boolean" Nullable="false" />
+          <Property Name="Subscription_Id" Type="Guid" Nullable="false" />
+          <NavigationProperty Name="Message" Relationship="Self.FK_UserQueue_Alert" FromRole="UserQueue" ToRole="Message" />
+        </EntityType>
+        <Association Name="FK_Parameter_Definition">
+          <End Role="Definition" Type="Self.Definition" Multiplicity="1" />
+          <End Role="Parameter" Type="Self.Parameter" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Definition">
+              <PropertyRef Name="Definition_Id" />
+            </Principal>
+            <Dependent Role="Parameter">
+              <PropertyRef Name="Definition_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserQueue_Alert">
+          <End Role="Message" Type="Self.Message" Multiplicity="1" />
+          <End Role="UserQueue" Type="Self.UserQueue" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Message">
+              <PropertyRef Name="Message_Id" />
+            </Principal>
+            <Dependent Role="UserQueue">
+              <PropertyRef Name="Message_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ParameterValue_Parameter">
+          <End Role="Parameter" Type="Self.Parameter" Multiplicity="1" />
+          <End Role="ParameterValue" Type="Self.ParameterValue" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Parameter">
+              <PropertyRef Name="Parameter_Id" />
+            </Principal>
+            <Dependent Role="ParameterValue">
+              <PropertyRef Name="Parameter_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="ALOHA_V1_DevEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Definitions" EntityType="Self.Definition" />
+          <EntitySet Name="Messages" EntityType="Self.Message" />
+          <EntitySet Name="Parameters" EntityType="Self.Parameter" />
+          <EntitySet Name="ParameterValues" EntityType="Self.ParameterValue" />
+          <EntitySet Name="UserQueues" EntityType="Self.UserQueue" />
+          <AssociationSet Name="FK_Parameter_Definition" Association="Self.FK_Parameter_Definition">
+            <End Role="Definition" EntitySet="Definitions" />
+            <End Role="Parameter" EntitySet="Parameters" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserQueue_Alert" Association="Self.FK_UserQueue_Alert">
+            <End Role="Message" EntitySet="Messages" />
+            <End Role="UserQueue" EntitySet="UserQueues" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ParameterValue_Parameter" Association="Self.FK_ParameterValue_Parameter">
+            <End Role="Parameter" EntitySet="Parameters" />
+            <End Role="ParameterValue" EntitySet="ParameterValues" />
+          </AssociationSet>
+          <FunctionImport Name="usp_InsertStaffBirthDayBySubscriptionID">
+          <Parameter Name="Subscription_Id" Mode="In" Type="Guid" />
+          </FunctionImport>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ALOHA_V1_DevModelStoreContainer" CdmEntityContainer="ALOHA_V1_DevEntities">
+          <EntitySetMapping Name="Definitions">
+            <EntityTypeMapping TypeName="ALOHA_V1_DevModel.Definition">
+              <MappingFragment StoreEntitySet="Definition">
+                <ScalarProperty Name="Definition_Id" ColumnName="Definition_Id" />
+                <ScalarProperty Name="EventMonitor_CLV_Id" ColumnName="EventMonitor_CLV_Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="Target_Component_CLV_Id" ColumnName="Target_Component_CLV_Id" />
+                <ScalarProperty Name="Target_SubComponent_CLV_Id" ColumnName="Target_SubComponent_CLV_Id" />
+                <ScalarProperty Name="DisplayTemplate" ColumnName="DisplayTemplate" />
+                <ScalarProperty Name="IsMonitored" ColumnName="IsMonitored" />
+                <ScalarProperty Name="IsRemoved" ColumnName="IsRemoved" />
+                <ScalarProperty Name="Subscription_Id" ColumnName="Subscription_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Messages">
+            <EntityTypeMapping TypeName="ALOHA_V1_DevModel.Message">
+              <MappingFragment StoreEntitySet="Message">
+                <ScalarProperty Name="Message_Id" ColumnName="Message_Id" />
+                <ScalarProperty Name="QueueDisplayMessage" ColumnName="QueueDisplayMessage" />
+                <ScalarProperty Name="CreatedTime" ColumnName="CreatedTime" />
+                <ScalarProperty Name="Target_Id" ColumnName="Target_Id" />
+                <ScalarProperty Name="Createdby_Id" ColumnName="Createdby_Id" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="LastEditedBy_Id" ColumnName="LastEditedBy_Id" />
+                <ScalarProperty Name="LastEditedOn" ColumnName="LastEditedOn" />
+                <ScalarProperty Name="IsRemoved" ColumnName="IsRemoved" />
+                <ScalarProperty Name="Subscription_Id" ColumnName="Subscription_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Parameters">
+            <EntityTypeMapping TypeName="ALOHA_V1_DevModel.Parameter">
+              <MappingFragment StoreEntitySet="Parameter">
+                <ScalarProperty Name="Parameter_Id" ColumnName="Parameter_Id" />
+                <ScalarProperty Name="Definition_Id" ColumnName="Definition_Id" />
+                <ScalarProperty Name="ParameterName" ColumnName="ParameterName" />
+                <ScalarProperty Name="ParameterCode" ColumnName="ParameterCode" />
+                <ScalarProperty Name="ParameterPrefixdescription" ColumnName="ParameterPrefixdescription" />
+                <ScalarProperty Name="ParameterPostfixdescription" ColumnName="ParameterPostfixdescription" />
+                <ScalarProperty Name="Parameter_CL_Id" ColumnName="Parameter_CL_Id" />
+                <ScalarProperty Name="IsRemoved" ColumnName="IsRemoved" />
+                <ScalarProperty Name="Subscription_Id" ColumnName="Subscription_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ParameterValues">
+            <EntityTypeMapping TypeName="ALOHA_V1_DevModel.ParameterValue">
+              <MappingFragment StoreEntitySet="ParameterValue">
+                <ScalarProperty Name="ParameterValue_Id" ColumnName="ParameterValue_Id" />
+                <ScalarProperty Name="Parameter_Id" ColumnName="Parameter_Id" />
+                <ScalarProperty Name="ParameterValue1" ColumnName="ParameterValue" />
+                <ScalarProperty Name="IsRemoved" ColumnName="IsRemoved" />
+                <ScalarProperty Name="Subscription_Id" ColumnName="Subscription_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserQueues">
+            <EntityTypeMapping TypeName="ALOHA_V1_DevModel.UserQueue">
+              <MappingFragment StoreEntitySet="UserQueue">
+                <ScalarProperty Name="UserQueue_Id" ColumnName="UserQueue_Id" />
+                <ScalarProperty Name="Message_Id" ColumnName="Message_Id" />
+                <ScalarProperty Name="User_Id" ColumnName="User_Id" />
+                <ScalarProperty Name="IsRead" ColumnName="IsRead" />
+                <ScalarProperty Name="IsHidden" ColumnName="IsHidden" />
+                <ScalarProperty Name="Createdby_Id" ColumnName="Createdby_Id" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="LastEditedBy_Id" ColumnName="LastEditedBy_Id" />
+                <ScalarProperty Name="LastEditedOn" ColumnName="LastEditedOn" />
+                <ScalarProperty Name="IsRemoved" ColumnName="IsRemoved" />
+                <ScalarProperty Name="Subscription_Id" ColumnName="Subscription_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="usp_InsertStaffBirthDayBySubscriptionID" FunctionName="ALOHA_V1_DevModel.Store.usp_InsertStaffBirthDayBySubscriptionID" />
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
