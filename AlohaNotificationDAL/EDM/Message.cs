@@ -30,8 +30,10 @@ namespace AlohaNotificationDAL.EDM
         public Nullable<long> LastEditedOn { get; set; }
         public Nullable<bool> IsRemoved { get; set; }
         public Nullable<System.Guid> Subscription_Id { get; set; }
+        public Nullable<int> Definition_Id { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserQueue> UserQueues { get; set; }
+        public virtual Definition Definition { get; set; }
     }
 }

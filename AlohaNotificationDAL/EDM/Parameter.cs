@@ -29,6 +29,7 @@ namespace AlohaNotificationDAL.EDM
         public int Parameter_CL_Id { get; set; }
         public bool IsRemoved { get; set; }
         public System.Guid Subscription_Id { get; set; }
+        public Nullable<bool> IsMultiSelect { get; set; }
     
         public virtual Definition Definition { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

@@ -12,33 +12,35 @@ namespace AlohaNotificationDAL.EDM
     using System;
     using System.Collections.Generic;
     
-    public partial class Definition
+    public partial class CustomListValue
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Definition()
+        public CustomListValue()
         {
-            this.Parameters = new HashSet<Parameter>();
-            this.Messages = new HashSet<Message>();
+            this.Definitions = new HashSet<Definition>();
+            this.Definitions1 = new HashSet<Definition>();
         }
     
-        public int Definition_Id { get; set; }
-        public int EventMonitor_CLV_Id { get; set; }
+        public int CustomListValue_Id { get; set; }
+        public int CustomList_Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Code { get; set; }
-        public int Target_Component_CLV_Id { get; set; }
-        public int Target_SubComponent_CLV_Id { get; set; }
-        public string DisplayTemplate { get; set; }
-        public Nullable<bool> IsMonitored { get; set; }
+        public bool IsEditable { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsSystemDefined { get; set; }
         public bool IsRemoved { get; set; }
+        public Nullable<int> CreatedBy_Id { get; set; }
+        public Nullable<long> CreatedOn { get; set; }
+        public Nullable<int> LastEditedBy_Id { get; set; }
+        public Nullable<long> LastEditedOn { get; set; }
         public System.Guid Subscription_Id { get; set; }
-        public Nullable<int> EventGroup_CLV_Id { get; set; }
+        public System.Guid InternalKey { get; set; }
+        public byte[] InternalHash { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Parameter> Parameters { get; set; }
-        public virtual CustomListValue CustomListValue { get; set; }
-        public virtual CustomListValue CustomListValue1 { get; set; }
+        public virtual ICollection<Definition> Definitions { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Message> Messages { get; set; }
+        public virtual ICollection<Definition> Definitions1 { get; set; }
     }
 }

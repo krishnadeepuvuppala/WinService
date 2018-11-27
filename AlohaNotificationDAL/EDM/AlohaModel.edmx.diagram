@@ -13,6 +13,10 @@
         <AssociationConnector Association="ALOHA_V1_DevModel.FK_Parameter_Definition" ManuallyRouted="false" />
         <AssociationConnector Association="ALOHA_V1_DevModel.FK_UserQueue_Alert" ManuallyRouted="false" />
         <AssociationConnector Association="ALOHA_V1_DevModel.FK_ParameterValue_Parameter" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="ALOHA_V1_DevModel.CustomListValue" Width="1.5" PointX="0.75" PointY="10.75" />
+        <AssociationConnector Association="ALOHA_V1_DevModel.FK_Definition_CustomListValue" />
+        <AssociationConnector Association="ALOHA_V1_DevModel.FK_Definition_CustomListValue1" />
+        <AssociationConnector Association="ALOHA_V1_DevModel.FK_Message_Definition" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

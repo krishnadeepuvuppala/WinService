@@ -32,6 +32,7 @@ namespace AlohaNotificationDAL.EDM
         public virtual DbSet<Parameter> Parameters { get; set; }
         public virtual DbSet<ParameterValue> ParameterValues { get; set; }
         public virtual DbSet<UserQueue> UserQueues { get; set; }
+        public virtual DbSet<CustomListValue> CustomListValues { get; set; }
     
         public virtual int usp_InsertStaffBirthDayBySubscriptionID(Nullable<System.Guid> subscription_Id)
         {
@@ -40,6 +41,23 @@ namespace AlohaNotificationDAL.EDM
                 new ObjectParameter("Subscription_Id", typeof(System.Guid));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_InsertStaffBirthDayBySubscriptionID", subscription_IdParameter);
+        }
+    
+        public virtual int usp_InsertQualificationExpirationBySubscriptionID(Nullable<System.Guid> subscription_Id, Nullable<int> duration, string howOften)
+        {
+            var subscription_IdParameter = subscription_Id.HasValue ?
+                new ObjectParameter("Subscription_Id", subscription_Id) :
+                new ObjectParameter("Subscription_Id", typeof(System.Guid));
+    
+            var durationParameter = duration.HasValue ?
+                new ObjectParameter("Duration", duration) :
+                new ObjectParameter("Duration", typeof(int));
+    
+            var howOftenParameter = howOften != null ?
+                new ObjectParameter("howOften", howOften) :
+                new ObjectParameter("howOften", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_InsertQualificationExpirationBySubscriptionID", subscription_IdParameter, durationParameter, howOftenParameter);
         }
     }
 }

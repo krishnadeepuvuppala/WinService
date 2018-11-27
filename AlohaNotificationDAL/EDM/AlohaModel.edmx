@@ -5,6 +5,27 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="ALOHA_V1_DevModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="CustomListValue">
+          <Key>
+            <PropertyRef Name="CustomListValue_Id" />
+          </Key>
+          <Property Name="CustomListValue_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CustomList_Id" Type="int" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="150" />
+          <Property Name="Description" Type="varchar" MaxLength="500" />
+          <Property Name="Code" Type="varchar" MaxLength="100" />
+          <Property Name="IsEditable" Type="bit" Nullable="false" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+          <Property Name="IsSystemDefined" Type="bit" Nullable="false" />
+          <Property Name="IsRemoved" Type="bit" Nullable="false" />
+          <Property Name="CreatedBy_Id" Type="int" />
+          <Property Name="CreatedOn" Type="bigint" />
+          <Property Name="LastEditedBy_Id" Type="int" />
+          <Property Name="LastEditedOn" Type="bigint" />
+          <Property Name="Subscription_Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="InternalKey" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="InternalHash" Type="binary" MaxLength="16" StoreGeneratedPattern="Computed" />
+        </EntityType>
         <EntityType Name="Definition">
           <Key>
             <PropertyRef Name="Definition_Id" />
@@ -14,6 +35,7 @@
           <Property Name="Name" Type="varchar" MaxLength="150" />
           <Property Name="Description" Type="varchar" MaxLength="150" />
           <Property Name="Code" Type="varchar" MaxLength="50" />
+          <Property Name="EventGroup_CLV_Id" Type="int" />
           <Property Name="Target_Component_CLV_Id" Type="int" Nullable="false" />
           <Property Name="Target_SubComponent_CLV_Id" Type="int" Nullable="false" />
           <Property Name="DisplayTemplate" Type="varchar" MaxLength="150" />
@@ -26,6 +48,7 @@
             <PropertyRef Name="Message_Id" />
           </Key>
           <Property Name="Message_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Definition_Id" Type="int" />
           <Property Name="QueueDisplayMessage" Type="varchar" MaxLength="250" />
           <Property Name="CreatedTime" Type="bigint" />
           <Property Name="Target_Id" Type="int" />
@@ -44,6 +67,7 @@
           <Property Name="Definition_Id" Type="int" Nullable="false" />
           <Property Name="ParameterName" Type="varchar" MaxLength="150" />
           <Property Name="ParameterCode" Type="varchar" MaxLength="50" />
+          <Property Name="IsMultiSelect" Type="bit" />
           <Property Name="ParameterPrefixdescription" Type="varchar" MaxLength="150" />
           <Property Name="ParameterPostfixdescription" Type="varchar" MaxLength="150" />
           <Property Name="Parameter_CL_Id" Type="int" Nullable="false" />
@@ -76,6 +100,42 @@
           <Property Name="IsRemoved" Type="bit" Nullable="false" />
           <Property Name="Subscription_Id" Type="uniqueidentifier" Nullable="false" />
         </EntityType>
+        <Association Name="FK_Definition_CustomListValue">
+          <End Role="CustomListValue" Type="Self.CustomListValue" Multiplicity="1" />
+          <End Role="Definition" Type="Self.Definition" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CustomListValue">
+              <PropertyRef Name="CustomListValue_Id" />
+            </Principal>
+            <Dependent Role="Definition">
+              <PropertyRef Name="EventMonitor_CLV_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Definition_CustomListValue1">
+          <End Role="CustomListValue" Type="Self.CustomListValue" Multiplicity="0..1" />
+          <End Role="Definition" Type="Self.Definition" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CustomListValue">
+              <PropertyRef Name="CustomListValue_Id" />
+            </Principal>
+            <Dependent Role="Definition">
+              <PropertyRef Name="EventGroup_CLV_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Message_Definition">
+          <End Role="Definition" Type="Self.Definition" Multiplicity="0..1" />
+          <End Role="Message" Type="Self.Message" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Definition">
+              <PropertyRef Name="Definition_Id" />
+            </Principal>
+            <Dependent Role="Message">
+              <PropertyRef Name="Definition_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Parameter_Definition">
           <End Role="Definition" Type="Self.Definition" Multiplicity="1" />
           <End Role="Parameter" Type="Self.Parameter" Multiplicity="*" />
@@ -112,15 +172,33 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Function Name="usp_InsertQualificationExpirationBySubscriptionID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Subscription_Id" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Duration" Type="int" Mode="In" />
+          <Parameter Name="howOften" Type="nvarchar" Mode="In" />
+        </Function>
         <Function Name="usp_InsertStaffBirthDayBySubscriptionID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="Subscription_Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <EntityContainer Name="ALOHA_V1_DevModelStoreContainer">
+          <EntitySet Name="CustomListValue" EntityType="Self.CustomListValue" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Definition" EntityType="Self.Definition" Schema="Notification" store:Type="Tables" />
           <EntitySet Name="Message" EntityType="Self.Message" Schema="Notification" store:Type="Tables" />
           <EntitySet Name="Parameter" EntityType="Self.Parameter" Schema="Notification" store:Type="Tables" />
           <EntitySet Name="ParameterValue" EntityType="Self.ParameterValue" Schema="Notification" store:Type="Tables" />
           <EntitySet Name="UserQueue" EntityType="Self.UserQueue" Schema="Notification" store:Type="Tables" />
+          <AssociationSet Name="FK_Definition_CustomListValue" Association="Self.FK_Definition_CustomListValue">
+            <End Role="CustomListValue" EntitySet="CustomListValue" />
+            <End Role="Definition" EntitySet="Definition" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Definition_CustomListValue1" Association="Self.FK_Definition_CustomListValue1">
+            <End Role="CustomListValue" EntitySet="CustomListValue" />
+            <End Role="Definition" EntitySet="Definition" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Message_Definition" Association="Self.FK_Message_Definition">
+            <End Role="Definition" EntitySet="Definition" />
+            <End Role="Message" EntitySet="Message" />
+          </AssociationSet>
           <AssociationSet Name="FK_Parameter_Definition" Association="Self.FK_Parameter_Definition">
             <End Role="Definition" EntitySet="Definition" />
             <End Role="Parameter" EntitySet="Parameter" />
@@ -154,6 +232,10 @@
           <Property Name="IsRemoved" Type="Boolean" Nullable="false" />
           <Property Name="Subscription_Id" Type="Guid" Nullable="false" />
           <NavigationProperty Name="Parameters" Relationship="Self.FK_Parameter_Definition" FromRole="Definition" ToRole="Parameter" />
+          <Property Name="EventGroup_CLV_Id" Type="Int32" />
+          <NavigationProperty Name="CustomListValue" Relationship="ALOHA_V1_DevModel.FK_Definition_CustomListValue" FromRole="Definition" ToRole="CustomListValue" />
+          <NavigationProperty Name="CustomListValue1" Relationship="ALOHA_V1_DevModel.FK_Definition_CustomListValue1" FromRole="Definition" ToRole="CustomListValue" />
+          <NavigationProperty Name="Messages" Relationship="ALOHA_V1_DevModel.FK_Message_Definition" FromRole="Definition" ToRole="Message" />
         </EntityType>
         <EntityType Name="Message">
           <Key>
@@ -170,6 +252,8 @@
           <Property Name="IsRemoved" Type="Boolean" />
           <Property Name="Subscription_Id" Type="Guid" />
           <NavigationProperty Name="UserQueues" Relationship="Self.FK_UserQueue_Alert" FromRole="Message" ToRole="UserQueue" />
+          <Property Name="Definition_Id" Type="Int32" />
+          <NavigationProperty Name="Definition" Relationship="ALOHA_V1_DevModel.FK_Message_Definition" FromRole="Message" ToRole="Definition" />
         </EntityType>
         <EntityType Name="Parameter">
           <Key>
@@ -186,6 +270,7 @@
           <Property Name="Subscription_Id" Type="Guid" Nullable="false" />
           <NavigationProperty Name="Definition" Relationship="Self.FK_Parameter_Definition" FromRole="Parameter" ToRole="Definition" />
           <NavigationProperty Name="ParameterValues" Relationship="Self.FK_ParameterValue_Parameter" FromRole="Parameter" ToRole="ParameterValue" />
+          <Property Name="IsMultiSelect" Type="Boolean" />
         </EntityType>
         <EntityType Name="ParameterValue">
           <Key>
@@ -272,7 +357,84 @@
           <FunctionImport Name="usp_InsertStaffBirthDayBySubscriptionID">
           <Parameter Name="Subscription_Id" Mode="In" Type="Guid" />
           </FunctionImport>
+          <FunctionImport Name="usp_InsertQualificationExpirationBySubscriptionID">
+            <Parameter Name="Subscription_Id" Mode="In" Type="Guid" />
+            <Parameter Name="Duration" Mode="In" Type="Int32" />
+            <Parameter Name="howOften" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="CustomListValues" EntityType="ALOHA_V1_DevModel.CustomListValue" />
+          <AssociationSet Name="FK_Definition_CustomListValue" Association="ALOHA_V1_DevModel.FK_Definition_CustomListValue">
+            <End Role="CustomListValue" EntitySet="CustomListValues" />
+            <End Role="Definition" EntitySet="Definitions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Definition_CustomListValue1" Association="ALOHA_V1_DevModel.FK_Definition_CustomListValue1">
+            <End Role="CustomListValue" EntitySet="CustomListValues" />
+            <End Role="Definition" EntitySet="Definitions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Message_Definition" Association="ALOHA_V1_DevModel.FK_Message_Definition">
+            <End Role="Definition" EntitySet="Definitions" />
+            <End Role="Message" EntitySet="Messages" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="CustomListValue">
+          <Key>
+            <PropertyRef Name="CustomListValue_Id" />
+          </Key>
+          <Property Name="CustomListValue_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CustomList_Id" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Description" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Code" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="IsEditable" Type="Boolean" Nullable="false" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="IsSystemDefined" Type="Boolean" Nullable="false" />
+          <Property Name="IsRemoved" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedBy_Id" Type="Int32" />
+          <Property Name="CreatedOn" Type="Int64" />
+          <Property Name="LastEditedBy_Id" Type="Int32" />
+          <Property Name="LastEditedOn" Type="Int64" />
+          <Property Name="Subscription_Id" Type="Guid" Nullable="false" />
+          <Property Name="InternalKey" Type="Guid" Nullable="false" />
+          <Property Name="InternalHash" Type="Binary" MaxLength="16" FixedLength="true" annotation:StoreGeneratedPattern="Computed" />
+          <NavigationProperty Name="Definitions" Relationship="ALOHA_V1_DevModel.FK_Definition_CustomListValue" FromRole="CustomListValue" ToRole="Definition" />
+          <NavigationProperty Name="Definitions1" Relationship="ALOHA_V1_DevModel.FK_Definition_CustomListValue1" FromRole="CustomListValue" ToRole="Definition" />
+        </EntityType>
+        <Association Name="FK_Definition_CustomListValue">
+          <End Type="ALOHA_V1_DevModel.CustomListValue" Role="CustomListValue" Multiplicity="1" />
+          <End Type="ALOHA_V1_DevModel.Definition" Role="Definition" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CustomListValue">
+              <PropertyRef Name="CustomListValue_Id" />
+            </Principal>
+            <Dependent Role="Definition">
+              <PropertyRef Name="EventMonitor_CLV_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Definition_CustomListValue1">
+          <End Type="ALOHA_V1_DevModel.CustomListValue" Role="CustomListValue" Multiplicity="0..1" />
+          <End Type="ALOHA_V1_DevModel.Definition" Role="Definition" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CustomListValue">
+              <PropertyRef Name="CustomListValue_Id" />
+            </Principal>
+            <Dependent Role="Definition">
+              <PropertyRef Name="EventGroup_CLV_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Message_Definition">
+          <End Type="ALOHA_V1_DevModel.Definition" Role="Definition" Multiplicity="0..1" />
+          <End Type="ALOHA_V1_DevModel.Message" Role="Message" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Definition">
+              <PropertyRef Name="Definition_Id" />
+            </Principal>
+            <Dependent Role="Message">
+              <PropertyRef Name="Definition_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -282,6 +444,7 @@
           <EntitySetMapping Name="Definitions">
             <EntityTypeMapping TypeName="ALOHA_V1_DevModel.Definition">
               <MappingFragment StoreEntitySet="Definition">
+                <ScalarProperty Name="EventGroup_CLV_Id" ColumnName="EventGroup_CLV_Id" />
                 <ScalarProperty Name="Definition_Id" ColumnName="Definition_Id" />
                 <ScalarProperty Name="EventMonitor_CLV_Id" ColumnName="EventMonitor_CLV_Id" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
@@ -299,6 +462,7 @@
           <EntitySetMapping Name="Messages">
             <EntityTypeMapping TypeName="ALOHA_V1_DevModel.Message">
               <MappingFragment StoreEntitySet="Message">
+                <ScalarProperty Name="Definition_Id" ColumnName="Definition_Id" />
                 <ScalarProperty Name="Message_Id" ColumnName="Message_Id" />
                 <ScalarProperty Name="QueueDisplayMessage" ColumnName="QueueDisplayMessage" />
                 <ScalarProperty Name="CreatedTime" ColumnName="CreatedTime" />
@@ -315,6 +479,7 @@
           <EntitySetMapping Name="Parameters">
             <EntityTypeMapping TypeName="ALOHA_V1_DevModel.Parameter">
               <MappingFragment StoreEntitySet="Parameter">
+                <ScalarProperty Name="IsMultiSelect" ColumnName="IsMultiSelect" />
                 <ScalarProperty Name="Parameter_Id" ColumnName="Parameter_Id" />
                 <ScalarProperty Name="Definition_Id" ColumnName="Definition_Id" />
                 <ScalarProperty Name="ParameterName" ColumnName="ParameterName" />
@@ -356,6 +521,29 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <FunctionImportMapping FunctionImportName="usp_InsertStaffBirthDayBySubscriptionID" FunctionName="ALOHA_V1_DevModel.Store.usp_InsertStaffBirthDayBySubscriptionID" />
+          <FunctionImportMapping FunctionImportName="usp_InsertQualificationExpirationBySubscriptionID" FunctionName="ALOHA_V1_DevModel.Store.usp_InsertQualificationExpirationBySubscriptionID" />
+          <EntitySetMapping Name="CustomListValues">
+            <EntityTypeMapping TypeName="ALOHA_V1_DevModel.CustomListValue">
+              <MappingFragment StoreEntitySet="CustomListValue">
+                <ScalarProperty Name="InternalHash" ColumnName="InternalHash" />
+                <ScalarProperty Name="InternalKey" ColumnName="InternalKey" />
+                <ScalarProperty Name="Subscription_Id" ColumnName="Subscription_Id" />
+                <ScalarProperty Name="LastEditedOn" ColumnName="LastEditedOn" />
+                <ScalarProperty Name="LastEditedBy_Id" ColumnName="LastEditedBy_Id" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="CreatedBy_Id" ColumnName="CreatedBy_Id" />
+                <ScalarProperty Name="IsRemoved" ColumnName="IsRemoved" />
+                <ScalarProperty Name="IsSystemDefined" ColumnName="IsSystemDefined" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="IsEditable" ColumnName="IsEditable" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="CustomList_Id" ColumnName="CustomList_Id" />
+                <ScalarProperty Name="CustomListValue_Id" ColumnName="CustomListValue_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

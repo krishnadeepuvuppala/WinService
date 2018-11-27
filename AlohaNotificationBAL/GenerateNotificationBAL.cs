@@ -17,8 +17,9 @@ namespace AlohaNotificationBAL
             //dt = new GenerateNotificationDAL().TestAdoNet();
             return dt;
         }
-        public bool GenerateNotifications()
+        public List<ResultModel> GenerateNotifications()
         {
+            List<ResultModel> lstResultModels = new List<ResultModel>();
             List<SubscriberDetailsModel> lstSubscribers = new List<SubscriberDetailsModel>();
             //lstSubscribers = new SubscriptionDetailsDL().GetSubscribersList();
 
@@ -28,10 +29,13 @@ namespace AlohaNotificationBAL
             //}
             
             ResultModel mdlBirthDayResult = new GenerateNotificationDL(ConstructConnString()).InsertBirthDayNotification("54E720FC-616B-44C6-8485-5F2185FD7B4C");
+            lstResultModels.Add(mdlBirthDayResult);
+            ResultModel mdlQualExpResult = new GenerateNotificationDL(ConstructConnString()).InsertQualificationNotifications("54E720FC-616B-44C6-8485-5F2185FD7B4C");
+            lstResultModels.Add(mdlQualExpResult);
             //if (lstSubscribers.Count > 0)
-                return true;
-           // else
-                //return false;
+            return lstResultModels;
+            // else
+            //return false;
         }
 
         public string ConstructConnString()
