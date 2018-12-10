@@ -17,6 +17,8 @@
         <AssociationConnector Association="ALOHA_V1_DevModel.FK_Definition_CustomListValue" />
         <AssociationConnector Association="ALOHA_V1_DevModel.FK_Definition_CustomListValue1" />
         <AssociationConnector Association="ALOHA_V1_DevModel.FK_Message_Definition" />
+        <EntityTypeShape EntityType="ALOHA_V1_DevModel.PayrollProcessBatch" Width="1.5" PointX="3" PointY="11.375" />
+        <AssociationConnector Association="ALOHA_V1_DevModel.FK_PayrollProcessBatch_CustomListValue" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -33,6 +33,7 @@ namespace AlohaNotificationDAL.EDM
         public virtual DbSet<ParameterValue> ParameterValues { get; set; }
         public virtual DbSet<UserQueue> UserQueues { get; set; }
         public virtual DbSet<CustomListValue> CustomListValues { get; set; }
+        public virtual DbSet<PayrollProcessBatch> PayrollProcessBatches { get; set; }
     
         public virtual int usp_InsertStaffBirthDayBySubscriptionID(Nullable<System.Guid> subscription_Id)
         {
@@ -58,6 +59,97 @@ namespace AlohaNotificationDAL.EDM
                 new ObjectParameter("howOften", typeof(string));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_InsertQualificationExpirationBySubscriptionID", subscription_IdParameter, durationParameter, howOftenParameter);
+        }
+    
+        public virtual int usp_InsertIncompleteAppointmentsBySubscriptionID(Nullable<System.Guid> subscription_Id, Nullable<int> settingDays, Nullable<long> sentdate)
+        {
+            var subscription_IdParameter = subscription_Id.HasValue ?
+                new ObjectParameter("Subscription_Id", subscription_Id) :
+                new ObjectParameter("Subscription_Id", typeof(System.Guid));
+    
+            var settingDaysParameter = settingDays.HasValue ?
+                new ObjectParameter("SettingDays", settingDays) :
+                new ObjectParameter("SettingDays", typeof(int));
+    
+            var sentdateParameter = sentdate.HasValue ?
+                new ObjectParameter("sentdate", sentdate) :
+                new ObjectParameter("sentdate", typeof(long));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_InsertIncompleteAppointmentsBySubscriptionID", subscription_IdParameter, settingDaysParameter, sentdateParameter);
+        }
+    
+        public virtual int usp_InsertSubmitTimesheetBySubscriptionID(Nullable<System.Guid> subscription_Id)
+        {
+            var subscription_IdParameter = subscription_Id.HasValue ?
+                new ObjectParameter("Subscription_Id", subscription_Id) :
+                new ObjectParameter("Subscription_Id", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_InsertSubmitTimesheetBySubscriptionID", subscription_IdParameter);
+        }
+    
+        public virtual int usp_InsertClinicalTeamNotificationBySubscriptionID(Nullable<System.Guid> subscription_Id, Nullable<long> lastRan)
+        {
+            var subscription_IdParameter = subscription_Id.HasValue ?
+                new ObjectParameter("Subscription_Id", subscription_Id) :
+                new ObjectParameter("Subscription_Id", typeof(System.Guid));
+    
+            var lastRanParameter = lastRan.HasValue ?
+                new ObjectParameter("lastRan", lastRan) :
+                new ObjectParameter("lastRan", typeof(long));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_InsertClinicalTeamNotificationBySubscriptionID", subscription_IdParameter, lastRanParameter);
+        }
+    
+        public virtual int usp_InsertStaffAssignmentsNotificationBySubscriptionID(Nullable<System.Guid> subscription_Id, Nullable<long> lastRan)
+        {
+            var subscription_IdParameter = subscription_Id.HasValue ?
+                new ObjectParameter("Subscription_Id", subscription_Id) :
+                new ObjectParameter("Subscription_Id", typeof(System.Guid));
+    
+            var lastRanParameter = lastRan.HasValue ?
+                new ObjectParameter("lastRan", lastRan) :
+                new ObjectParameter("lastRan", typeof(long));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_InsertStaffAssignmentsNotificationBySubscriptionID", subscription_IdParameter, lastRanParameter);
+        }
+    
+        public virtual int usp_InsertTeamAssignmentsNotificationBySubscriptionID(Nullable<System.Guid> subscription_Id, Nullable<long> lastRan)
+        {
+            var subscription_IdParameter = subscription_Id.HasValue ?
+                new ObjectParameter("Subscription_Id", subscription_Id) :
+                new ObjectParameter("Subscription_Id", typeof(System.Guid));
+    
+            var lastRanParameter = lastRan.HasValue ?
+                new ObjectParameter("lastRan", lastRan) :
+                new ObjectParameter("lastRan", typeof(long));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_InsertTeamAssignmentsNotificationBySubscriptionID", subscription_IdParameter, lastRanParameter);
+        }
+    
+        public virtual int usp_InsertSupervisorNotificationBySubscriptionID(Nullable<System.Guid> subscription_Id, Nullable<long> lastRan)
+        {
+            var subscription_IdParameter = subscription_Id.HasValue ?
+                new ObjectParameter("Subscription_Id", subscription_Id) :
+                new ObjectParameter("Subscription_Id", typeof(System.Guid));
+    
+            var lastRanParameter = lastRan.HasValue ?
+                new ObjectParameter("lastRan", lastRan) :
+                new ObjectParameter("lastRan", typeof(long));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_InsertSupervisorNotificationBySubscriptionID", subscription_IdParameter, lastRanParameter);
+        }
+    
+        public virtual int usp_InsertSubordinateNotificationBySubscriptionID(Nullable<System.Guid> subscription_Id, Nullable<long> lastRan)
+        {
+            var subscription_IdParameter = subscription_Id.HasValue ?
+                new ObjectParameter("Subscription_Id", subscription_Id) :
+                new ObjectParameter("Subscription_Id", typeof(System.Guid));
+    
+            var lastRanParameter = lastRan.HasValue ?
+                new ObjectParameter("lastRan", lastRan) :
+                new ObjectParameter("lastRan", typeof(long));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_InsertSubordinateNotificationBySubscriptionID", subscription_IdParameter, lastRanParameter);
         }
     }
 }

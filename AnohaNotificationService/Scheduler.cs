@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Aloha.Notification.Models;
+using AlohaNotificationBAL;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
@@ -8,87 +11,141 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
-using Aloha.Notification.Models;
-using AlohaNotificationBAL;
+using System.Timers;
 
 namespace AnohaNotificationService
 {
     public partial class Scheduler : ServiceBase
     {
-        System.Timers.Timer _timer;
-        DateTime _scheduleTime;
-        DateTime _lastRun;
+        Timer ManyTimesADayTimer = new Timer();
+        Timer OnceADayTimer;
+        private string timeString;
 
         public Scheduler()
         {
             InitializeComponent();
-            _timer = new System.Timers.Timer();
-            _scheduleTime = DateTime.Today.AddHours(9).AddMinutes(48);
-
-            /*_timer = new System.Timers.Timer();
-            _scheduleTime = DateTime.Today.AddDays(1).AddHours(7);
-            */
+            //Initializing the OnceADayTimer timers
+            OnceADayTimer = new System.Timers.Timer();
+            double inter = (double)GetNextInterval();
+            OnceADayTimer.Interval = inter;
+            OnceADayTimer.Elapsed += new ElapsedEventHandler(ServiceTimer_Tick); // adding Event
 
         }
 
         public void OnDebug()
         {
-            //DataTable dt = new GenerateNotificationBAL().TestAdoNet();
-            //List<ResultModel> lstNotificationsGenerated = new GenerateNotificationBAL().GenerateNotifications();
             OnStart(null);
         }
 
         protected override void OnStart(string[] args)
         {
-            /*_timer.Enabled = true;
-            _timer.Interval = _scheduleTime.Subtract(DateTime.Now).TotalSeconds * 1000;  
-            */
-            //List<ResultModel> lstNotificationsGenerated = new GenerateNotificationBAL().GenerateNotifications();
-            //ActionLogger.WriteLog(lstNotificationsGenerated);
+#if DEBUG
+            List<ResultModel> lstNotificationsGenerated = new GenerateNotificationBAL().GenerateNotifications();
+            ActionLogger.WriteLog(lstNotificationsGenerated);
+            new GenerateNotificationBAL().UpdateLastRan();
+
+            List<ResultModel> lstNotificationsGenerate1 = new GenerateNotificationBAL().GenerateNotificationsOnceADay();
+            ActionLogger.WriteLog(lstNotificationsGenerate1);
+
+#else
             File.Create(AppDomain.CurrentDomain.BaseDirectory + "onStart.txt");
-            _timer = new System.Timers.Timer(1 * 60 * 1000); // every 10 minutes??
-            _timer.Elapsed += new System.Timers.ElapsedEventHandler(Timer_Elapsed);
-            _timer.Start();
-            //List<ResultModel> lstNotificationsGenerated = new GenerateNotificationBAL().GenerateNotifications();
-            //ActionLogger.WriteLog(lstNotificationsGenerated);
+
+            OnceADayTimer.AutoReset = true;
+            OnceADayTimer.Enabled = true;
+
+            //Initializing ManyTimesADayTimer 
+            ManyTimesADayTimer.Elapsed += new ElapsedEventHandler(Timer_Elapsed); // adding Event
+            ManyTimesADayTimer.Interval = 600000;//120000; //60000;//Runs for every given intervel 
+            ManyTimesADayTimer.Enabled = true;
+            ManyTimesADayTimer.Start();
+#endif
         }
 
+        /// <summary>
+        /// Executing the many times a day service
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            //DateTime startAt = DateTime.Today.AddHours(9).AddMinutes(48);
-            DateTime startAt = DateTime.Today.AddHours(11).AddMinutes(48);
-            //DateTime startAt = DateTime.Now;
-            if (_lastRun < startAt && DateTime.Now >= startAt)
+            try
             {
-                // stop the timer 
-                _timer.Stop();
-
-                try
-                {
-                    List<ResultModel> lstNotificationsGenerated = new GenerateNotificationBAL().GenerateNotifications();
-                    ActionLogger.WriteLog(lstNotificationsGenerated);
-                }
-                catch (Exception ex)
-                {
-
-                }
-
-                _lastRun = DateTime.Now;
-                _timer.Start();
-
-
-                /*
-                //If tick for the first time, reset next run to every 24 hours
-                if (_timer.Interval != 24 * 60 * 60 * 1000)
-                {
-                    _timer.Interval = 24 * 60 * 60 * 1000;
-                }
-                */
+                List<ResultModel> lstNotificationsGenerated = new GenerateNotificationBAL().GenerateNotifications();
+                ActionLogger.WriteLog(lstNotificationsGenerated);
+                new GenerateNotificationBAL().UpdateLastRan();
+            }
+            catch (Exception ex)
+            {
+                ActionLogger.WriteErrorLog(ex);
             }
         }
+
+#region Once a day implementation 
+        /// <summary>
+        /// Gives the time intervel for next execution
+        /// </summary>
+        /// <returns>Time in milliSec</returns>
+        private double GetNextInterval()
+        {
+            //Getting the time when to start execution
+            timeString = ConfigurationManager.AppSettings["StartTime"];
+            DateTime t = DateTime.Parse(timeString);
+            TimeSpan ts = new TimeSpan();
+            ts = t - System.DateTime.Now;
+            if (ts.TotalMilliseconds < 0)
+            {
+                ts = t.AddDays(1) - System.DateTime.Now;  
+            }
+            return ts.TotalMilliseconds;
+        }
+
+        /// <summary>
+        /// Setting the timer for next execution
+        /// </summary>
+        private void SetTimer()
+        {
+            try
+            {
+                double inter = (double)GetNextInterval();
+                OnceADayTimer.Interval = inter;
+                OnceADayTimer.Start();
+            }
+            catch (Exception ex)
+            {
+                ActionLogger.WriteErrorLog(ex);
+            }
+        }
+
+        /// <summary>
+        /// Executing once a day service 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ServiceTimer_Tick(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            try
+            {
+                OnceADayTimer.Stop();
+                List<ResultModel> lstNotificationsGenerated = new GenerateNotificationBAL().GenerateNotificationsOnceADay();
+                ActionLogger.WriteLog(lstNotificationsGenerated);
+                SetTimer();
+            }
+            catch(Exception ex)
+            {
+                ActionLogger.WriteErrorLog(ex);
+            }
+        }
+#endregion
+
         protected override void OnStop()
         {
+            OnceADayTimer.AutoReset = false;
+            OnceADayTimer.Enabled = false;
+
+            ManyTimesADayTimer.Enabled = false;
             File.Create(AppDomain.CurrentDomain.BaseDirectory + "onStop.txt");
         }
+
     }
+
 }

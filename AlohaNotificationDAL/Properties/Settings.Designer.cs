@@ -34,5 +34,17 @@ namespace AlohaNotificationDAL.Properties {
                 this["SubscriptionID"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("817971596")]
+        public long LastRan {
+            get {
+                return ((long)(this["LastRan"]));
+            }
+            set {
+                this["LastRan"] = value;
+            }
+        }
     }
 }

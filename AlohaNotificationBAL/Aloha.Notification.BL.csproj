@@ -31,11 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Aloha.Notification.Models">
+    <Reference Include="Aloha.Notification.Models, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Aloha.Notification.Models\bin\Debug\Aloha.Notification.Models.dll</HintPath>
-    </Reference>
-    <Reference Include="AlohaNotificationDAL">
-      <HintPath>..\AlohaNotificationDAL\bin\Debug\AlohaNotificationDAL.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -49,6 +47,12 @@
   <ItemGroup>
     <Compile Include="GenerateNotificationBAL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AlohaNotificationDAL\Aloha.Notification.DL.csproj">
+      <Project>{D9472B66-C9B0-40DE-86E8-60B1863B1A9B}</Project>
+      <Name>Aloha.Notification.DL</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

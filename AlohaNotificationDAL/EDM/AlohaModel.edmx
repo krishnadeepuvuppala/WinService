@@ -26,6 +26,22 @@
           <Property Name="InternalKey" Type="uniqueidentifier" Nullable="false" />
           <Property Name="InternalHash" Type="binary" MaxLength="16" StoreGeneratedPattern="Computed" />
         </EntityType>
+        <EntityType Name="PayrollProcessBatch">
+          <Key>
+            <PropertyRef Name="PayrollProcessBatch_Id" />
+          </Key>
+          <Property Name="PayrollProcessBatch_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PayrollPeriodStartDate" Type="bigint" />
+          <Property Name="PayrollPeriodEndDate" Type="bigint" />
+          <Property Name="PayrollFrequency_CLV_Id" Type="int" />
+          <Property Name="Createdby_Id" Type="int" />
+          <Property Name="CreatedOn" Type="bigint" />
+          <Property Name="Subscription_Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IsRemoved" Type="bit" Nullable="false" />
+          <Property Name="InternalKey" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ExternalKey" Type="varchar" MaxLength="100" />
+          <Property Name="InternalHash" Type="binary" MaxLength="16" StoreGeneratedPattern="Computed" />
+        </EntityType>
         <EntityType Name="Definition">
           <Key>
             <PropertyRef Name="Definition_Id" />
@@ -160,6 +176,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_PayrollProcessBatch_CustomListValue">
+          <End Role="CustomListValue" Type="Self.CustomListValue" Multiplicity="0..1" />
+          <End Role="PayrollProcessBatch" Type="Self.PayrollProcessBatch" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CustomListValue">
+              <PropertyRef Name="CustomListValue_Id" />
+            </Principal>
+            <Dependent Role="PayrollProcessBatch">
+              <PropertyRef Name="PayrollFrequency_CLV_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_UserQueue_Alert">
           <End Role="Message" Type="Self.Message" Multiplicity="1" />
           <End Role="UserQueue" Type="Self.UserQueue" Multiplicity="*" />
@@ -172,16 +200,45 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Function Name="usp_InsertClinicalTeamNotificationBySubscriptionID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Subscription_Id" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="lastRan" Type="bigint" Mode="In" />
+        </Function>
+        <Function Name="usp_InsertIncompleteAppointmentsBySubscriptionID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Subscription_Id" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="SettingDays" Type="int" Mode="In" />
+          <Parameter Name="sentdate" Type="bigint" Mode="In" />
+        </Function>
         <Function Name="usp_InsertQualificationExpirationBySubscriptionID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="Subscription_Id" Type="uniqueidentifier" Mode="In" />
           <Parameter Name="Duration" Type="int" Mode="In" />
           <Parameter Name="howOften" Type="nvarchar" Mode="In" />
         </Function>
+        <Function Name="usp_InsertStaffAssignmentsNotificationBySubscriptionID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Subscription_Id" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="lastRan" Type="bigint" Mode="In" />
+        </Function>
         <Function Name="usp_InsertStaffBirthDayBySubscriptionID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="Subscription_Id" Type="uniqueidentifier" Mode="In" />
         </Function>
+        <Function Name="usp_InsertSubmitTimesheetBySubscriptionID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Subscription_Id" Type="uniqueidentifier" Mode="In" />
+        </Function>
+        <Function Name="usp_InsertSubordinateNotificationBySubscriptionID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Subscription_Id" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="lastRan" Type="bigint" Mode="In" />
+        </Function>
+        <Function Name="usp_InsertSupervisorNotificationBySubscriptionID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Subscription_Id" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="lastRan" Type="bigint" Mode="In" />
+        </Function>
+        <Function Name="usp_InsertTeamAssignmentsNotificationBySubscriptionID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Subscription_Id" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="lastRan" Type="bigint" Mode="In" />
+        </Function>
         <EntityContainer Name="ALOHA_V1_DevModelStoreContainer">
           <EntitySet Name="CustomListValue" EntityType="Self.CustomListValue" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PayrollProcessBatch" EntityType="Self.PayrollProcessBatch" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Definition" EntityType="Self.Definition" Schema="Notification" store:Type="Tables" />
           <EntitySet Name="Message" EntityType="Self.Message" Schema="Notification" store:Type="Tables" />
           <EntitySet Name="Parameter" EntityType="Self.Parameter" Schema="Notification" store:Type="Tables" />
@@ -206,6 +263,10 @@
           <AssociationSet Name="FK_ParameterValue_Parameter" Association="Self.FK_ParameterValue_Parameter">
             <End Role="Parameter" EntitySet="Parameter" />
             <End Role="ParameterValue" EntitySet="ParameterValue" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PayrollProcessBatch_CustomListValue" Association="Self.FK_PayrollProcessBatch_CustomListValue">
+            <End Role="CustomListValue" EntitySet="CustomListValue" />
+            <End Role="PayrollProcessBatch" EntitySet="PayrollProcessBatch" />
           </AssociationSet>
           <AssociationSet Name="FK_UserQueue_Alert" Association="Self.FK_UserQueue_Alert">
             <End Role="Message" EntitySet="Message" />
@@ -375,6 +436,39 @@
             <End Role="Definition" EntitySet="Definitions" />
             <End Role="Message" EntitySet="Messages" />
           </AssociationSet>
+          <FunctionImport Name="usp_InsertIncompleteAppointmentsBySubscriptionID">
+            <Parameter Name="Subscription_Id" Mode="In" Type="Guid" />
+            <Parameter Name="SettingDays" Mode="In" Type="Int32" />
+            <Parameter Name="sentdate" Mode="In" Type="Int64" />
+          </FunctionImport>
+          <FunctionImport Name="usp_InsertSubmitTimesheetBySubscriptionID">
+          <Parameter Name="Subscription_Id" Mode="In" Type="Guid" />
+          </FunctionImport>
+          <EntitySet Name="PayrollProcessBatches" EntityType="ALOHA_V1_DevModel.PayrollProcessBatch" />
+          <AssociationSet Name="FK_PayrollProcessBatch_CustomListValue" Association="ALOHA_V1_DevModel.FK_PayrollProcessBatch_CustomListValue">
+            <End Role="CustomListValue" EntitySet="CustomListValues" />
+            <End Role="PayrollProcessBatch" EntitySet="PayrollProcessBatches" />
+          </AssociationSet>
+          <FunctionImport Name="usp_InsertClinicalTeamNotificationBySubscriptionID">
+            <Parameter Name="Subscription_Id" Mode="In" Type="Guid" />
+            <Parameter Name="lastRan" Mode="In" Type="Int64" />
+          </FunctionImport>
+          <FunctionImport Name="usp_InsertStaffAssignmentsNotificationBySubscriptionID">
+            <Parameter Name="Subscription_Id" Mode="In" Type="Guid" />
+            <Parameter Name="lastRan" Mode="In" Type="Int64" />
+          </FunctionImport>
+          <FunctionImport Name="usp_InsertTeamAssignmentsNotificationBySubscriptionID">
+            <Parameter Name="Subscription_Id" Mode="In" Type="Guid" />
+            <Parameter Name="lastRan" Mode="In" Type="Int64" />
+          </FunctionImport>
+          <FunctionImport Name="usp_InsertSupervisorNotificationBySubscriptionID">
+            <Parameter Name="Subscription_Id" Mode="In" Type="Guid" />
+            <Parameter Name="lastRan" Mode="In" Type="Int64" />
+          </FunctionImport>
+          <FunctionImport Name="usp_InsertSubordinateNotificationBySubscriptionID">
+            <Parameter Name="Subscription_Id" Mode="In" Type="Guid" />
+            <Parameter Name="lastRan" Mode="In" Type="Int64" />
+          </FunctionImport>
         </EntityContainer>
         <EntityType Name="CustomListValue">
           <Key>
@@ -398,6 +492,7 @@
           <Property Name="InternalHash" Type="Binary" MaxLength="16" FixedLength="true" annotation:StoreGeneratedPattern="Computed" />
           <NavigationProperty Name="Definitions" Relationship="ALOHA_V1_DevModel.FK_Definition_CustomListValue" FromRole="CustomListValue" ToRole="Definition" />
           <NavigationProperty Name="Definitions1" Relationship="ALOHA_V1_DevModel.FK_Definition_CustomListValue1" FromRole="CustomListValue" ToRole="Definition" />
+          <NavigationProperty Name="PayrollProcessBatches" Relationship="ALOHA_V1_DevModel.FK_PayrollProcessBatch_CustomListValue" FromRole="CustomListValue" ToRole="PayrollProcessBatch" />
         </EntityType>
         <Association Name="FK_Definition_CustomListValue">
           <End Type="ALOHA_V1_DevModel.CustomListValue" Role="CustomListValue" Multiplicity="1" />
@@ -432,6 +527,35 @@
             </Principal>
             <Dependent Role="Message">
               <PropertyRef Name="Definition_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="PayrollProcessBatch">
+          <Key>
+            <PropertyRef Name="PayrollProcessBatch_Id" />
+          </Key>
+          <Property Name="PayrollProcessBatch_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PayrollPeriodStartDate" Type="Int64" />
+          <Property Name="PayrollPeriodEndDate" Type="Int64" />
+          <Property Name="PayrollFrequency_CLV_Id" Type="Int32" />
+          <Property Name="Createdby_Id" Type="Int32" />
+          <Property Name="CreatedOn" Type="Int64" />
+          <Property Name="Subscription_Id" Type="Guid" Nullable="false" />
+          <Property Name="IsRemoved" Type="Boolean" Nullable="false" />
+          <Property Name="InternalKey" Type="Guid" Nullable="false" />
+          <Property Name="ExternalKey" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="InternalHash" Type="Binary" MaxLength="16" FixedLength="true" annotation:StoreGeneratedPattern="Computed" />
+          <NavigationProperty Name="CustomListValue" Relationship="ALOHA_V1_DevModel.FK_PayrollProcessBatch_CustomListValue" FromRole="PayrollProcessBatch" ToRole="CustomListValue" />
+        </EntityType>
+        <Association Name="FK_PayrollProcessBatch_CustomListValue">
+          <End Type="ALOHA_V1_DevModel.CustomListValue" Role="CustomListValue" Multiplicity="0..1" />
+          <End Type="ALOHA_V1_DevModel.PayrollProcessBatch" Role="PayrollProcessBatch" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CustomListValue">
+              <PropertyRef Name="CustomListValue_Id" />
+            </Principal>
+            <Dependent Role="PayrollProcessBatch">
+              <PropertyRef Name="PayrollFrequency_CLV_Id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -544,6 +668,30 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="usp_InsertIncompleteAppointmentsBySubscriptionID" FunctionName="ALOHA_V1_DevModel.Store.usp_InsertIncompleteAppointmentsBySubscriptionID" />
+          <FunctionImportMapping FunctionImportName="usp_InsertSubmitTimesheetBySubscriptionID" FunctionName="ALOHA_V1_DevModel.Store.usp_InsertSubmitTimesheetBySubscriptionID" />
+          <EntitySetMapping Name="PayrollProcessBatches">
+            <EntityTypeMapping TypeName="ALOHA_V1_DevModel.PayrollProcessBatch">
+              <MappingFragment StoreEntitySet="PayrollProcessBatch">
+                <ScalarProperty Name="InternalHash" ColumnName="InternalHash" />
+                <ScalarProperty Name="ExternalKey" ColumnName="ExternalKey" />
+                <ScalarProperty Name="InternalKey" ColumnName="InternalKey" />
+                <ScalarProperty Name="IsRemoved" ColumnName="IsRemoved" />
+                <ScalarProperty Name="Subscription_Id" ColumnName="Subscription_Id" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="Createdby_Id" ColumnName="Createdby_Id" />
+                <ScalarProperty Name="PayrollFrequency_CLV_Id" ColumnName="PayrollFrequency_CLV_Id" />
+                <ScalarProperty Name="PayrollPeriodEndDate" ColumnName="PayrollPeriodEndDate" />
+                <ScalarProperty Name="PayrollPeriodStartDate" ColumnName="PayrollPeriodStartDate" />
+                <ScalarProperty Name="PayrollProcessBatch_Id" ColumnName="PayrollProcessBatch_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="usp_InsertClinicalTeamNotificationBySubscriptionID" FunctionName="ALOHA_V1_DevModel.Store.usp_InsertClinicalTeamNotificationBySubscriptionID" />
+          <FunctionImportMapping FunctionImportName="usp_InsertStaffAssignmentsNotificationBySubscriptionID" FunctionName="ALOHA_V1_DevModel.Store.usp_InsertStaffAssignmentsNotificationBySubscriptionID" />
+          <FunctionImportMapping FunctionImportName="usp_InsertTeamAssignmentsNotificationBySubscriptionID" FunctionName="ALOHA_V1_DevModel.Store.usp_InsertTeamAssignmentsNotificationBySubscriptionID" />
+          <FunctionImportMapping FunctionImportName="usp_InsertSupervisorNotificationBySubscriptionID" FunctionName="ALOHA_V1_DevModel.Store.usp_InsertSupervisorNotificationBySubscriptionID" />
+          <FunctionImportMapping FunctionImportName="usp_InsertSubordinateNotificationBySubscriptionID" FunctionName="ALOHA_V1_DevModel.Store.usp_InsertSubordinateNotificationBySubscriptionID" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

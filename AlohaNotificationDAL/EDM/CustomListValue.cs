@@ -19,6 +19,7 @@ namespace AlohaNotificationDAL.EDM
         {
             this.Definitions = new HashSet<Definition>();
             this.Definitions1 = new HashSet<Definition>();
+            this.PayrollProcessBatches = new HashSet<PayrollProcessBatch>();
         }
     
         public int CustomListValue_Id { get; set; }
@@ -42,5 +43,7 @@ namespace AlohaNotificationDAL.EDM
         public virtual ICollection<Definition> Definitions { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Definition> Definitions1 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<PayrollProcessBatch> PayrollProcessBatches { get; set; }
     }
 }

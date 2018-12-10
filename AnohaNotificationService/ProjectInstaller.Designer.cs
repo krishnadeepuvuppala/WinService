@@ -39,7 +39,9 @@
             // 
             // serviceInstaller1
             // 
-            this.serviceInstaller1.ServiceName = "AlohaNotificationWinService";
+            this.serviceInstaller1.ServiceName = "AlohaABANotificationWinServiceLive";
+            this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
+            this.serviceInstaller1.AfterInstall += new System.Configuration.Install.InstallEventHandler(this.serviceInstaller1_AfterInstall);
             // 
             // ProjectInstaller
             // 

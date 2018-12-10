@@ -5,5 +5,8 @@
     <Setting Name="SubscriptionID" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="LastRan" Type="System.Int64" Scope="User">
+      <Value Profile="(Default)">817971596</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

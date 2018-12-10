@@ -30,7 +30,7 @@ namespace AnohaNotificationService
         }
 
         /// <summary>  
-        /// this function write Message to log file.  
+        /// This function will log Actions to LogFile.text  
         /// </summary>  
         /// <param name="Message"></param>  
         public static void WriteLog(List<ResultModel> lstResusltList)
@@ -38,14 +38,15 @@ namespace AnohaNotificationService
             StreamWriter SW = null;
             try
             {
-                SW = new StreamWriter(AppDomain.CurrentDomain.BaseDirectory + "\\LogFile"+ DateTime.Now.ToString() + ".txt", true);
+                TimeSpan ts = new TimeSpan(12, 50, 0);
+                SW = new StreamWriter(AppDomain.CurrentDomain.BaseDirectory + "\\LogFile.txt", true);
                 SW.Write("\r\n\n");
                 SW.WriteLine(DateTime.Now.ToString());
                 SW.Write("\r\n\n");
                 foreach (ResultModel rm in lstResusltList)
                 {
                     SW.WriteLine(rm.MessageReason);
-                    SW.Write("\n");
+                    SW.Write("\r\n");
                 }
                 SW.Flush();
                 SW.Close();

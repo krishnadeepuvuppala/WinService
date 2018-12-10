@@ -52,7 +52,8 @@ namespace AlohaNotificationDAL
         {
             SqlConnection conn = new SqlConnection();
             //var temp = System.Configuration.ConfigurationSettings.AppSettings["GlobalConnectionString"];
-            var temp = "data source=104.238.74.145;initial catalog=ALOHA_V1_Global; persist security info=True;user id=aloha_appuser;password=t0pn0tch0726;MultipleActiveResultSets=True;App=EntityFramework";
+            //var temp = "data source=104.238.74.145;initial catalog=ALOHA_V1_Global; persist security info=True;user id=aloha_appuser;password=t0pn0tch0726;MultipleActiveResultSets=True;App=EntityFramework";
+            var temp = "data source=10.0.3.4;initial catalog=ALOHA_V1_Global; persist security info=True;user id=aloha_appuser;password=t0pn0tch@0726;MultipleActiveResultSets=True;App=EntityFramework";
             conn.ConnectionString = temp + "&quot;";
             return conn;
         }
